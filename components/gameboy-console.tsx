@@ -6,9 +6,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Eraser,
-  Paintbrush,
+  Gift,
+  Heart,
+  ImageIcon,
+  Music2,
   Power,
+  ScrollText,
+  type LucideIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -23,22 +27,17 @@ import {
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
-const GRID_COLUMNS = 18
-const GRID_ROWS = 12
-const GRID_SIZE = GRID_COLUMNS * GRID_ROWS
-
 type Direction = "up" | "down" | "left" | "right"
 type ActionControl = "a" | "b" | "start" | "select"
 type Control = Direction | ActionControl
+type ScreenState = "booting" | "menu" | "detail"
 
-type Cursor = {
-  x: number
-  y: number
-}
-
-const DEFAULT_CURSOR: Cursor = {
-  x: Math.floor(GRID_COLUMNS / 2),
-  y: Math.floor(GRID_ROWS / 2),
+type MenuItem = {
+  id: string
+  title: string
+  subtitle: string
+  icon: LucideIcon
+  notes: string[]
 }
 
 const KEY_TO_CONTROL: Record<string, Control> = {
@@ -54,33 +53,80 @@ const KEY_TO_CONTROL: Record<string, Control> = {
   Shift: "select",
 }
 
-const MOVE_VECTOR: Record<Direction, { dx: number; dy: number }> = {
-  up: { dx: 0, dy: -1 },
-  down: { dx: 0, dy: 1 },
-  left: { dx: -1, dy: 0 },
-  right: { dx: 1, dy: 0 },
-}
+const MENU_ITEMS: MenuItem[] = [
+  {
+    id: "wish",
+    title: "Birthday Wish",
+    subtitle: "surat kecil untukmu",
+    icon: ScrollText,
+    notes: [
+      "selamat ulang tahun, semoga harimu hangat dan tenang.",
+      "terima kasih sudah jadi orang yang berarti di hidupku.",
+      "semoga tahun ini lebih ringan, lebih berani, dan lebih bahagia.",
+    ],
+  },
+  {
+    id: "moments",
+    title: "Best Moments",
+    subtitle: "potongan kenangan",
+    icon: ImageIcon,
+    notes: [
+      "aku suka cara kamu tertawa waktu cerita receh sekalipun.",
+      "aku suka obrolan panjang kita yang bikin waktu hilang.",
+      "aku suka hal-hal kecil yang kamu lakukan dengan tulus.",
+    ],
+  },
+  {
+    id: "playlist",
+    title: "Song Queue",
+    subtitle: "lagu buat hari ini",
+    icon: Music2,
+    notes: [
+      "01. lagu pembuka yang cerah untuk pagi ulang tahunmu.",
+      "02. lagu nostalgia biar senyum-senyum sendiri.",
+      "03. lagu penutup buat doa baik malam ini.",
+    ],
+  },
+  {
+    id: "gift",
+    title: "Final Gift",
+    subtitle: "hadiah utama",
+    icon: Gift,
+    notes: [
+      "hadiah terbaikku: doa baik, waktu, dan perhatian yang terus ada.",
+      "semoga kamu merasa dicintai, bukan cuma hari ini tapi selalu.",
+      "press replay kapan pun kamu mau senyum lagi.",
+    ],
+  },
+]
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.max(min, Math.min(max, value))
-
-const toPixelKey = ({ x, y }: Cursor) => `${x}:${y}`
+const BOOT_LINES = [
+  "mounting birthday cartridge...",
+  "loading pixel memories...",
+  "syncing heart protocol...",
+  "calibrating gift menu...",
+  "ready: web boy birthday edition",
+]
 
 export function GameboyConsole() {
-  const [cursor, setCursor] = React.useState<Cursor>(DEFAULT_CURSOR)
-  const [activePixels, setActivePixels] = React.useState<Set<string>>(
-    () => new Set()
-  )
+  const [screenState, setScreenState] = React.useState<ScreenState>("booting")
+  const [bootProgress, setBootProgress] = React.useState(0)
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
+  const [openedIndex, setOpenedIndex] = React.useState<number | null>(null)
   const [pressedControls, setPressedControls] = React.useState<Set<Control>>(
     () => new Set()
   )
-  const [status, setStatus] = React.useState("BOOT COMPLETE")
-  const [powerOn, setPowerOn] = React.useState(true)
+  const [status, setStatus] = React.useState("INITIALIZING SYSTEM")
 
-  const cells = React.useMemo(
-    () => Array.from({ length: GRID_SIZE }, (_, index) => index),
-    []
-  )
+  const openedItem = openedIndex === null ? null : MENU_ITEMS[openedIndex]
+
+  const visibleBootLines = React.useMemo(() => {
+    const count = Math.min(
+      BOOT_LINES.length,
+      Math.ceil((bootProgress / 100) * BOOT_LINES.length)
+    )
+    return BOOT_LINES.slice(0, count)
+  }, [bootProgress])
 
   const setPressed = React.useCallback((control: Control, pressed: boolean) => {
     setPressedControls((current) => {
@@ -94,29 +140,11 @@ export function GameboyConsole() {
     })
   }, [])
 
-  const moveCursor = React.useCallback((direction: Direction) => {
-    const vector = MOVE_VECTOR[direction]
-    setCursor((current) => ({
-      x: clamp(current.x + vector.dx, 0, GRID_COLUMNS - 1),
-      y: clamp(current.y + vector.dy, 0, GRID_ROWS - 1),
-    }))
+  const cycleMenu = React.useCallback((step: number) => {
+    setSelectedIndex((current) =>
+      (current + step + MENU_ITEMS.length) % MENU_ITEMS.length
+    )
   }, [])
-
-  const paintPixel = React.useCallback(() => {
-    setActivePixels((current) => {
-      const next = new Set(current)
-      next.add(toPixelKey(cursor))
-      return next
-    })
-  }, [cursor])
-
-  const erasePixel = React.useCallback(() => {
-    setActivePixels((current) => {
-      const next = new Set(current)
-      next.delete(toPixelKey(cursor))
-      return next
-    })
-  }, [cursor])
 
   const runControl = React.useCallback(
     (control: Control, isRepeat = false) => {
@@ -124,56 +152,126 @@ export function GameboyConsole() {
         if (isRepeat) {
           return
         }
-        setPowerOn((current) => {
-          const next = !current
-          setStatus(next ? "POWER ON" : "POWER OFF")
-          if (!next) {
-            setPressedControls(new Set())
-          }
-          return next
-        })
+
+        setScreenState("booting")
+        setBootProgress(0)
+        setOpenedIndex(null)
+        setStatus("REBOOTING SYSTEM")
         return
       }
 
-      if (!powerOn) {
+      if (screenState === "booting") {
+        if (control === "select" && !isRepeat) {
+          setBootProgress(100)
+          setScreenState("menu")
+          setStatus("BOOT SKIPPED")
+        }
         return
       }
 
       if (control === "select") {
-        if (isRepeat) {
-          return
+        if (!isRepeat) {
+          setStatus("TIP: NAVIGATE WITH D-PAD, OPEN WITH A")
         }
-        setActivePixels(new Set())
-        setStatus("SCREEN CLEAR")
         return
       }
 
-      if (control === "a") {
-        paintPixel()
-        setStatus("PIXEL DRAWN")
+      if (screenState === "menu") {
+        if (control === "up" || control === "left") {
+          cycleMenu(-1)
+          setStatus("MENU UP")
+          return
+        }
+
+        if (control === "down" || control === "right") {
+          cycleMenu(1)
+          setStatus("MENU DOWN")
+          return
+        }
+
+        if (control === "a") {
+          const item = MENU_ITEMS[selectedIndex]
+          setOpenedIndex(selectedIndex)
+          setScreenState("detail")
+          setStatus(`OPEN ${item.title.toUpperCase()}`)
+          return
+        }
+
+        if (control === "b") {
+          setStatus("YOU ARE ALREADY ON MAIN MENU")
+        }
         return
       }
 
       if (control === "b") {
-        erasePixel()
-        setStatus("PIXEL ERASED")
+        setScreenState("menu")
+        setStatus("BACK TO MAIN MENU")
         return
       }
 
-      moveCursor(control)
-      setStatus(`MOVE ${control.toUpperCase()}`)
+      if (
+        control === "up" ||
+        control === "left" ||
+        control === "down" ||
+        control === "right"
+      ) {
+        const step = control === "up" || control === "left" ? -1 : 1
+        const baseIndex = openedIndex ?? selectedIndex
+        const nextIndex =
+          (baseIndex + step + MENU_ITEMS.length) % MENU_ITEMS.length
+        const item = MENU_ITEMS[nextIndex]
+
+        setOpenedIndex(nextIndex)
+        setSelectedIndex(nextIndex)
+        setStatus(`OPEN ${item.title.toUpperCase()}`)
+        return
+      }
+
+      if (control === "a") {
+        setStatus("HAPPY BIRTHDAY")
+      }
     },
-    [erasePixel, moveCursor, paintPixel, powerOn]
+    [cycleMenu, openedIndex, screenState, selectedIndex]
   )
+
+  React.useEffect(() => {
+    if (screenState !== "booting") {
+      return
+    }
+
+    setBootProgress(0)
+    setPressedControls(new Set())
+
+    let timeoutId: number | undefined
+    const intervalId = window.setInterval(() => {
+      setBootProgress((current) => {
+        const increment = current < 66 ? 7 : current < 92 ? 4 : 2
+        const next = Math.min(100, current + increment)
+
+        if (next === 100) {
+          window.clearInterval(intervalId)
+          timeoutId = window.setTimeout(() => {
+            setScreenState("menu")
+            setStatus("SYSTEM READY")
+          }, 380)
+        }
+
+        return next
+      })
+    }, 90)
+
+    return () => {
+      window.clearInterval(intervalId)
+      if (timeoutId) {
+        window.clearTimeout(timeoutId)
+      }
+    }
+  }, [screenState])
 
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const control = KEY_TO_CONTROL[event.key]
       if (!control) {
-        return
-      }
-
-      if (!powerOn && control !== "start") {
         return
       }
 
@@ -199,12 +297,9 @@ export function GameboyConsole() {
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("keyup", onKeyUp)
     }
-  }, [powerOn, runControl, setPressed])
+  }, [runControl, setPressed])
 
   const handleControlDown = (control: Control) => () => {
-    if (!powerOn && control !== "start") {
-      return
-    }
     setPressed(control, true)
     runControl(control)
   }
@@ -214,6 +309,9 @@ export function GameboyConsole() {
   }
 
   const isPressed = (control: Control) => pressedControls.has(control)
+  const isBooting = screenState === "booting"
+  const activeMenu = openedItem ?? MENU_ITEMS[selectedIndex]
+  const DetailIcon = openedItem?.icon
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_16%_10%,color-mix(in_oklab,var(--color-gb-aura)_68%,transparent),transparent_38%),radial-gradient(circle_at_90%_0%,color-mix(in_oklab,var(--color-gb-screen)_42%,white),transparent_32%),linear-gradient(180deg,var(--color-gb-bg-top),var(--color-gb-bg-bottom))] px-4 py-10 md:px-6">
@@ -227,19 +325,21 @@ export function GameboyConsole() {
                 Web Boy 01
               </CardTitle>
               <CardDescription className="text-[0.7rem] uppercase tracking-[0.26em] text-gb-label/80 md:text-[0.76rem]">
-                Dot Matrix Interactive Screen
+                Birthday Cartridge Firmware
               </CardDescription>
             </div>
             <div className="flex items-center gap-2 rounded-full border border-gb-shell-edge/80 bg-gb-shell-inner px-3 py-1">
               <span
                 className={cn(
                   "size-2.5 rounded-full transition-colors",
-                  powerOn ? "bg-lime-400 shadow-[0_0_12px_#bef264]" : "bg-zinc-500"
+                  isBooting
+                    ? "bg-amber-400 shadow-[0_0_12px_#facc15]"
+                    : "bg-lime-400 shadow-[0_0_12px_#bef264]"
                 )}
                 aria-hidden
               />
               <span className="font-heading text-[0.58rem] uppercase tracking-[0.2em] text-gb-label/90">
-                {powerOn ? "Power" : "Standby"}
+                {isBooting ? "Boot" : "Ready"}
               </span>
             </div>
           </div>
@@ -248,59 +348,141 @@ export function GameboyConsole() {
         <CardContent className="flex flex-col gap-6 pb-5">
           <section className="rounded-[1.6rem] border-4 border-gb-bezel bg-gb-bezel-inner p-4 shadow-[inset_0_2px_14px_color-mix(in_oklab,var(--color-gb-shell-edge)_35%,black)] md:p-5">
             <div
-              className={cn(
-                "relative aspect-[10/7] overflow-hidden rounded-md border-2 border-gb-screen-frame p-2 shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--color-gb-screen)_80%,black)]",
-                powerOn ? "bg-gb-screen" : "bg-gb-screen-dim"
-              )}
+              className="relative aspect-[10/7] overflow-hidden rounded-md border-2 border-gb-screen-frame bg-gb-screen p-2 shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--color-gb-screen)_80%,black)]"
               aria-label="gameboy-screen"
             >
-              {powerOn ? <div className="pointer-events-none absolute inset-0 gb-scanline opacity-50" /> : null}
+              <div className="pointer-events-none absolute inset-0 gb-scanline opacity-45" />
 
-              <div
-                className="relative grid h-full w-full overflow-hidden rounded-[3px] border border-gb-grid/70"
-                style={{
-                  gridTemplateColumns: `repeat(${GRID_COLUMNS}, minmax(0, 1fr))`,
-                }}
-              >
-                {cells.map((cell) => {
-                  const x = cell % GRID_COLUMNS
-                  const y = Math.floor(cell / GRID_COLUMNS)
-                  const key = `${x}:${y}`
-                  const lit = activePixels.has(key)
-                  const cursorActive = powerOn && cursor.x === x && cursor.y === y
+              {isBooting ? (
+                <div className="relative flex h-full flex-col justify-between gap-3 rounded-[4px] border border-gb-grid/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-gb-screen)_90%,white),color-mix(in_oklab,var(--color-gb-pixel-off)_70%,black))] p-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="font-heading text-[0.64rem] uppercase tracking-[0.24em] text-gb-screen-frame">
+                      Web Boy Firmware
+                    </p>
+                    <p className="text-[0.52rem] uppercase tracking-[0.16em] text-gb-screen-frame/80">
+                      Loading birthday edition
+                    </p>
+                  </div>
 
-                  return (
-                    <div
-                      key={key}
-                      className={cn(
-                        "border border-gb-grid/25 transition-colors duration-100",
-                        powerOn
-                          ? lit
-                            ? "bg-gb-pixel-on"
-                            : "bg-gb-pixel-off"
-                          : "bg-gb-screen-dim",
-                        cursorActive
-                          ? "bg-gb-cursor shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-gb-cursor)_75%,black)]"
-                          : null
-                      )}
-                    />
-                  )
-                })}
-              </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="h-2 rounded-full border border-gb-grid/75 bg-gb-pixel-off/65 p-0.5">
+                      <div
+                        className="h-full rounded-full bg-gb-pixel-on transition-[width] duration-150"
+                        style={{ width: `${bootProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-[0.5rem] uppercase tracking-[0.16em] text-gb-screen-frame/80">
+                      boot {bootProgress.toString().padStart(3, "0")}%
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-1 overflow-hidden text-[0.5rem] uppercase tracking-[0.15em] text-gb-screen-frame/85">
+                    {visibleBootLines.map((line, index) => (
+                      <p
+                        key={line}
+                        className="gb-boot-line"
+                        style={{ animationDelay: `${index * 65}ms` }}
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ) : screenState === "menu" ? (
+                <div className="relative flex h-full flex-col gap-2 rounded-[4px] border border-gb-grid/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-gb-screen)_88%,white),color-mix(in_oklab,var(--color-gb-pixel-off)_78%,black))] p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-heading text-[0.64rem] uppercase tracking-[0.24em] text-gb-screen-frame/90">
+                      Main Menu
+                    </p>
+                    <p className="text-[0.5rem] uppercase tracking-[0.16em] text-gb-screen-frame/80">
+                      {selectedIndex + 1}/{MENU_ITEMS.length}
+                    </p>
+                  </div>
+
+                  <ul className="flex flex-1 flex-col justify-center gap-1.5">
+                    {MENU_ITEMS.map((item, index) => {
+                      const Icon = item.icon
+                      const isActive = index === selectedIndex
+
+                      return (
+                        <li
+                          key={item.id}
+                          className={cn(
+                            "flex items-center gap-2 rounded-sm border px-2 py-1 transition-colors",
+                            isActive
+                              ? "border-gb-screen-frame bg-gb-pixel-on text-gb-action-foreground"
+                              : "border-gb-grid/45 bg-gb-pixel-off/80 text-gb-screen-frame/90"
+                          )}
+                        >
+                          <Icon className="size-3.5" />
+                          <div className="flex flex-col leading-none">
+                            <span className="font-heading text-[0.56rem] uppercase tracking-[0.16em]">
+                              {item.title}
+                            </span>
+                            <span
+                              className={cn(
+                                "text-[0.44rem] uppercase tracking-[0.13em]",
+                                isActive
+                                  ? "text-gb-action-foreground/90"
+                                  : "text-gb-screen-frame/80"
+                              )}
+                            >
+                              {item.subtitle}
+                            </span>
+                          </div>
+                          {isActive ? <ChevronRight className="ml-auto size-3" /> : null}
+                        </li>
+                      )
+                    })}
+                  </ul>
+
+                  <p className="text-[0.5rem] uppercase tracking-[0.15em] text-gb-screen-frame/80">
+                    A open | B back | Start reboot
+                  </p>
+                </div>
+              ) : openedItem ? (
+                <div className="relative flex h-full flex-col gap-3 rounded-[4px] border border-gb-grid/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-gb-screen)_88%,white),color-mix(in_oklab,var(--color-gb-pixel-off)_74%,black))] p-3">
+                  <header className="flex items-center gap-2 rounded-sm border border-gb-grid/50 bg-gb-pixel-off/80 px-2 py-1">
+                    {DetailIcon ? (
+                      <DetailIcon className="size-4 text-gb-screen-frame/90" />
+                    ) : null}
+                    <div className="flex flex-col leading-none">
+                      <p className="font-heading text-[0.58rem] uppercase tracking-[0.17em] text-gb-screen-frame/95">
+                        {openedItem.title}
+                      </p>
+                      <p className="text-[0.45rem] uppercase tracking-[0.13em] text-gb-screen-frame/80">
+                        {openedItem.subtitle}
+                      </p>
+                    </div>
+                  </header>
+
+                  <div className="flex flex-1 flex-col justify-center gap-2">
+                    {openedItem.notes.map((note) => (
+                      <p
+                        key={note}
+                        className="rounded-sm border border-gb-grid/35 bg-gb-pixel-off/70 px-2 py-1 text-[0.53rem] uppercase tracking-[0.12em] text-gb-screen-frame/90"
+                      >
+                        {note}
+                      </p>
+                    ))}
+                  </div>
+
+                  <p className="text-[0.5rem] uppercase tracking-[0.15em] text-gb-screen-frame/80">
+                    B menu | Left/Right next card
+                  </p>
+                </div>
+              ) : null}
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md bg-gb-shell-inner px-3 py-2 text-[0.64rem] uppercase tracking-[0.18em] text-gb-label/90 md:text-[0.7rem]">
-              <span>Pixels {activePixels.size.toString().padStart(3, "0")}</span>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md bg-gb-shell-inner px-3 py-2 text-[0.62rem] uppercase tracking-[0.18em] text-gb-label/90 md:text-[0.7rem]">
+              <span>Mode {screenState}</span>
               <span>{status}</span>
-              <span>
-                Cursor {cursor.x.toString().padStart(2, "0")}:
-                {cursor.y.toString().padStart(2, "0")}
-              </span>
+              <span>{activeMenu.title}</span>
             </div>
           </section>
 
           <section className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr]">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <p className="font-heading text-xs uppercase tracking-[0.24em] text-gb-label/85">
                 D-Pad
               </p>
@@ -309,7 +491,7 @@ export function GameboyConsole() {
                   variant="secondary"
                   size="icon-lg"
                   aria-label="Move Up"
-                  disabled={!powerOn}
+                  disabled={isBooting}
                   onPointerDown={handleControlDown("up")}
                   onPointerUp={handleControlUp("up")}
                   onPointerLeave={handleControlUp("up")}
@@ -325,7 +507,7 @@ export function GameboyConsole() {
                   variant="secondary"
                   size="icon-lg"
                   aria-label="Move Left"
-                  disabled={!powerOn}
+                  disabled={isBooting}
                   onPointerDown={handleControlDown("left")}
                   onPointerUp={handleControlUp("left")}
                   onPointerLeave={handleControlUp("left")}
@@ -337,11 +519,16 @@ export function GameboyConsole() {
                 >
                   <ChevronLeft />
                 </Button>
+                <div className="col-start-2 row-start-2 flex size-11 items-center justify-center rounded-xl border-2 border-gb-shell-edge bg-gb-key inset-shadow-sm">
+                  <span className="font-heading text-[0.55rem] tracking-[0.2em] text-gb-label/80">
+                    NAV
+                  </span>
+                </div>
                 <Button
                   variant="secondary"
                   size="icon-lg"
                   aria-label="Move Right"
-                  disabled={!powerOn}
+                  disabled={isBooting}
                   onPointerDown={handleControlDown("right")}
                   onPointerUp={handleControlUp("right")}
                   onPointerLeave={handleControlUp("right")}
@@ -357,7 +544,7 @@ export function GameboyConsole() {
                   variant="secondary"
                   size="icon-lg"
                   aria-label="Move Down"
-                  disabled={!powerOn}
+                  disabled={isBooting}
                   onPointerDown={handleControlDown("down")}
                   onPointerUp={handleControlUp("down")}
                   onPointerLeave={handleControlUp("down")}
@@ -373,7 +560,7 @@ export function GameboyConsole() {
             </div>
 
             <div className="hidden h-full items-end justify-center md:flex">
-              <div className="space-y-2 rounded-xl border border-gb-shell-edge/75 bg-gb-shell-inner p-3">
+              <div className="flex flex-col gap-2 rounded-xl border border-gb-shell-edge/75 bg-gb-shell-inner p-3">
                 <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
                 <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
                 <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
@@ -381,7 +568,7 @@ export function GameboyConsole() {
               </div>
             </div>
 
-            <div className="space-y-2 justify-self-end">
+            <div className="flex flex-col gap-2 justify-self-end">
               <p className="text-right font-heading text-xs uppercase tracking-[0.24em] text-gb-label/85">
                 Actions
               </p>
@@ -390,7 +577,7 @@ export function GameboyConsole() {
                   variant="secondary"
                   size="icon-lg"
                   aria-label="Button A"
-                  disabled={!powerOn}
+                  disabled={isBooting}
                   onPointerDown={handleControlDown("a")}
                   onPointerUp={handleControlUp("a")}
                   onPointerLeave={handleControlUp("a")}
@@ -400,13 +587,13 @@ export function GameboyConsole() {
                     isPressed("a") && "translate-y-px bg-gb-action-active"
                   )}
                 >
-                  <Paintbrush data-icon="inline-start" />A
+                  <Heart data-icon="inline-start" />A
                 </Button>
                 <Button
                   variant="secondary"
                   size="icon-lg"
                   aria-label="Button B"
-                  disabled={!powerOn}
+                  disabled={isBooting}
                   onPointerDown={handleControlDown("b")}
                   onPointerUp={handleControlUp("b")}
                   onPointerLeave={handleControlUp("b")}
@@ -416,7 +603,7 @@ export function GameboyConsole() {
                     isPressed("b") && "translate-y-px bg-gb-action-active"
                   )}
                 >
-                  <Eraser data-icon="inline-start" />B
+                  <ChevronLeft data-icon="inline-start" />B
                 </Button>
               </div>
             </div>
@@ -425,15 +612,14 @@ export function GameboyConsole() {
 
         <CardFooter className="justify-between gap-2 border-t border-gb-shell-edge/70 bg-transparent px-4 pt-5 pb-0">
           <p className="font-heading text-[0.62rem] uppercase tracking-[0.2em] text-gb-label/80 md:text-[0.7rem]">
-            Arrow Keys / Z / X / Enter / Shift
+            Arrow / Z / X / Enter / Shift
           </p>
 
           <ButtonGroup>
             <Button
               variant="outline"
               size="sm"
-              aria-label="Clear Screen"
-              disabled={!powerOn}
+              aria-label="Select Help"
               onPointerDown={handleControlDown("select")}
               onPointerUp={handleControlUp("select")}
               onPointerLeave={handleControlUp("select")}
@@ -448,7 +634,7 @@ export function GameboyConsole() {
             <Button
               variant="outline"
               size="sm"
-              aria-label="Power Toggle"
+              aria-label="Start Reboot"
               onPointerDown={handleControlDown("start")}
               onPointerUp={handleControlUp("start")}
               onPointerLeave={handleControlUp("start")}

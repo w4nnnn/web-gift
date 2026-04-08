@@ -223,6 +223,12 @@
   animation: gb-scan 1s linear infinite;
 }
 
+.gb-boot-line {
+  opacity: 0;
+  transform: translateY(3px);
+  animation: gb-boot-line 280ms ease-out forwards;
+}
+
 @keyframes gb-boot {
   from {
     opacity: 0;
@@ -243,9 +249,21 @@
   }
 }
 
+@keyframes gb-boot-line {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gb-console-boot,
-  .gb-scanline {
+  .gb-scanline,
+  .gb-boot-line {
     animation: none;
   }
 }
