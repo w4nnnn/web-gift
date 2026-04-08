@@ -1,6 +1,5 @@
+import { GameboyConsole } from "@/components/gameboy-console";
+
 export default function Home() {
-  return (
-    <div>
-    </div>
-  );
+  return <GameboyConsole />;
 }
