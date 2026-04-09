@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Heart,
   Power,
   Volume2,
   VolumeX,
@@ -33,6 +32,7 @@ type GameboySystemFooterProps = ControlHandlers & {
   showOffScreen: boolean
   currentTrack: string | null
   isBgmEnabled: boolean
+  className?: string
 }
 
 export function GameboyPadControls({
@@ -43,7 +43,7 @@ export function GameboyPadControls({
   handleControlUp,
 }: GameboyPadControlsProps) {
   return (
-    <section className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr]">
+    <section className="grid grid-cols-2 items-end gap-4 md:gap-6">
       <div className="flex flex-col gap-2">
         <p className="font-heading text-xs uppercase tracking-[0.24em] text-gb-label/85">
           D-Pad
@@ -116,15 +116,6 @@ export function GameboyPadControls({
         </div>
       </div>
 
-      <div className="hidden h-full items-end justify-center md:flex">
-        <div className="flex flex-col gap-2 rounded-xl border border-gb-shell-edge/75 bg-gb-shell-inner p-3">
-          <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
-          <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
-          <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
-          <div className="h-1 w-20 rounded-full bg-gb-shell-edge/65" />
-        </div>
-      </div>
-
       <div className="flex flex-col gap-2 justify-self-end">
         <p className="text-right font-heading text-xs uppercase tracking-[0.24em] text-gb-label/85">
           Actions
@@ -144,7 +135,7 @@ export function GameboyPadControls({
               isPressed("a") && "translate-y-px bg-gb-action-active"
             )}
           >
-            <Heart data-icon="inline-start" />A
+            A
           </Button>
           <Button
             variant="secondary"
@@ -160,7 +151,7 @@ export function GameboyPadControls({
               isPressed("b") && "translate-y-px bg-gb-action-active"
             )}
           >
-            <ChevronLeft data-icon="inline-start" />B
+            B
           </Button>
         </div>
       </div>
@@ -175,10 +166,11 @@ export function GameboySystemFooter({
   isPressed,
   handleControlDown,
   handleControlUp,
+  className,
 }: GameboySystemFooterProps) {
   return (
-    <CardFooter className="justify-between gap-2 border-t border-gb-shell-edge/70 bg-transparent px-4 pt-5 pb-0">
-      <p className="font-heading text-[0.62rem] uppercase tracking-[0.2em] text-gb-label/80 md:text-[0.7rem]">
+    <CardFooter className={cn("justify-between gap-2 border-t border-gb-shell-edge/70 bg-transparent px-4 pt-4 pb-0", className)}>
+      <p className="hidden font-heading text-[0.62rem] uppercase tracking-[0.2em] text-gb-label/80 md:block md:text-[0.7rem]">
         Arrow / Z / X / Enter / Shift
       </p>
 

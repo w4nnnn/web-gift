@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GameboyPadControls, GameboySystemFooter } from "@/components/gameboy/gameboy-controls"
 import { GameboyScreen } from "@/components/gameboy/gameboy-screen"
 import { useGameboyState } from "@/components/gameboy/use-gameboy-state"
@@ -40,7 +40,7 @@ export function GameboyConsole() {
   } = useGameboyState()
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_16%_10%,color-mix(in_oklab,var(--color-gb-aura)_68%,transparent),transparent_38%),radial-gradient(circle_at_90%_0%,color-mix(in_oklab,var(--color-gb-screen)_42%,white),transparent_32%),linear-gradient(180deg,var(--color-gb-bg-top),var(--color-gb-bg-bottom))] px-4 py-10 md:px-6">
+    <main className="relative h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_16%_10%,color-mix(in_oklab,var(--color-gb-aura)_68%,transparent),transparent_38%),radial-gradient(circle_at_90%_0%,color-mix(in_oklab,var(--color-gb-screen)_42%,white),transparent_32%),linear-gradient(180deg,var(--color-gb-bg-top),var(--color-gb-bg-bottom))] px-3 py-3 md:px-5 md:py-4">
       <audio
         ref={audioRef}
         src={currentTrack ?? undefined}
@@ -51,16 +51,14 @@ export function GameboyConsole() {
 
       <div className="pointer-events-none absolute inset-0 gb-noise" />
 
-      <Card className="gb-console-boot relative mx-auto w-full max-w-4xl rounded-[2.2rem] border-4 border-gb-shell-edge bg-gb-shell py-6 shadow-[0_30px_80px_-20px_color-mix(in_oklab,var(--color-gb-shell-edge)_62%,black)]">
+      <div className="mx-auto flex h-full w-full max-w-4xl items-center justify-center">
+      <Card className="gb-console-boot relative flex h-full max-h-full w-full flex-col rounded-[2.2rem] border-4 border-gb-shell-edge bg-gb-shell py-4 shadow-[0_30px_80px_-20px_color-mix(in_oklab,var(--color-gb-shell-edge)_62%,black)] md:py-6">
         <CardHeader className="pb-1">
           <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="font-heading text-xl tracking-[0.14em] text-gb-label md:text-2xl">
-                Web Boy 01
+                Web Boy
               </CardTitle>
-              <CardDescription className="text-[0.7rem] uppercase tracking-[0.26em] text-gb-label/80 md:text-[0.76rem]">
-                Birthday Cartridge Firmware
-              </CardDescription>
             </div>
 
             <div className="flex items-center gap-2 rounded-full border border-gb-shell-edge/80 bg-gb-shell-inner px-3 py-1">
@@ -82,7 +80,7 @@ export function GameboyConsole() {
           </div>
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-6 pb-5">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden pb-3 md:gap-6 md:pb-5">
           <GameboyScreen
             showOffScreen={showOffScreen}
             isBooting={isBooting}
@@ -128,6 +126,7 @@ export function GameboyConsole() {
           handleControlUp={handleControlUp}
         />
       </Card>
+      </div>
     </main>
   )
 }

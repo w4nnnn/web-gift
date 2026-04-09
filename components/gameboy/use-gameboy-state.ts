@@ -70,6 +70,12 @@ type GiftGameState = {
   items: GiftFallingItem[]
 }
 
+const toMediaKey = (src: string) =>
+  decodeURIComponent(src.split("/").pop() ?? src)
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[\s_-]+/g, "")
+    .toLowerCase()
+
 const createGiftGameState = (mode: GiftGameMode = "idle"): GiftGameState => ({
   mode,
   playerLane: Math.floor(GIFT_GAME_LANES / 2),
@@ -125,6 +131,39 @@ export function useGameboyState(): GameboyState {
   const currentTrack = bgmTracks[trackIndex] ?? null
   const activeMomentsTab: MomentsMediaTab =
     MOMENTS_SECTIONS[momentsTabIndex]?.id ?? "photo"
+  const musicTrackByKey = React.useMemo(() => {
+    const map = new Map<string, number>()
+
+    bgmTracks.forEach((track, index) => {
+      const key = toMediaKey(track)
+      if (!map.has(key)) {
+        map.set(key, index)
+      }
+    })
+
+    return map
+  }, [bgmTracks])
+
+  const resolvePhotoTrackIndex = React.useCallback(
+    (photoIndex: number) => {
+      if (bgmTracks.length <= 0) {
+        return null
+      }
+
+      const photo = photoAlbum[photoIndex]
+      if (!photo) {
+        return 0
+      }
+
+      const matchedIndex = musicTrackByKey.get(toMediaKey(photo.src))
+      if (matchedIndex !== undefined) {
+        return matchedIndex
+      }
+
+      return photoIndex % bgmTracks.length
+    },
+    [bgmTracks.length, musicTrackByKey, photoAlbum]
+  )
 
   React.useEffect(() => {
     giftGameRef.current = giftGame
@@ -620,6 +659,35 @@ export function useGameboyState(): GameboyState {
 
     playBgm()
   }, [currentTrack, isBgmEnabled, isPoweredOn, playBgm, stopBgm])
+
+  React.useEffect(() => {
+    if (
+      !isPoweredOn ||
+      screenState !== "detail" ||
+      openedItem?.id !== "moments" ||
+      momentsViewMode !== "viewer" ||
+      activeMomentsTab !== "photo"
+    ) {
+      return
+    }
+
+    const targetTrackIndex = resolvePhotoTrackIndex(activePhotoIndex)
+    if (targetTrackIndex === null) {
+      return
+    }
+
+    setTrackIndex((current) =>
+      current === targetTrackIndex ? current : targetTrackIndex
+    )
+  }, [
+    activeMomentsTab,
+    activePhotoIndex,
+    isPoweredOn,
+    momentsViewMode,
+    openedItem?.id,
+    resolvePhotoTrackIndex,
+    screenState,
+  ])
 
   React.useEffect(() => {
     if (!isPoweredOn || screenState !== "detail" || openedItem?.id !== "wish") {

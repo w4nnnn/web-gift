@@ -94,7 +94,7 @@ export function GameboyScreen({
   }, [giftItems])
 
   return (
-    <section className="rounded-[1.6rem] border-4 border-gb-bezel bg-gb-bezel-inner p-4 shadow-[inset_0_2px_14px_color-mix(in_oklab,var(--color-gb-shell-edge)_35%,black)] md:p-5">
+    <section className="rounded-[1.6rem] border-4 border-gb-bezel bg-gb-bezel-inner p-3 shadow-[inset_0_2px_14px_color-mix(in_oklab,var(--color-gb-shell-edge)_35%,black)] md:p-4">
       <div
         className={cn(
           "relative aspect-[10/7] overflow-hidden rounded-md border-2 border-gb-screen-frame p-2 shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--color-gb-screen)_80%,black)]",
@@ -199,9 +199,6 @@ export function GameboyScreen({
               })}
             </ul>
 
-            <p className="text-[0.5rem] uppercase tracking-[0.15em] text-gb-screen-frame/80">
-              A open | B back | Select music
-            </p>
           </div>
         ) : openedItem ? (
           <div className="relative flex h-full flex-col gap-2 rounded-[4px] border border-gb-grid/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-gb-screen)_88%,white),color-mix(in_oklab,var(--color-gb-pixel-off)_74%,black))] p-3">
@@ -278,9 +275,6 @@ export function GameboyScreen({
                       })}
                     </ul>
 
-                    <p className="text-[0.5rem] uppercase tracking-[0.15em] text-gb-screen-frame/80">
-                      A open | B menu | left/right choose
-                    </p>
                   </div>
                 ) : (
                   <div className="flex min-h-0 flex-1 flex-col gap-2">
@@ -423,17 +417,6 @@ export function GameboyScreen({
               </div>
             ) : null}
 
-            <p className="text-[0.5rem] uppercase tracking-[0.15em] text-gb-screen-frame/80">
-              {openedItem.id === "moments" && momentsViewMode === "submenu"
-                ? "A open | left/right choose | B menu"
-                : openedItem.id === "moments"
-                  ? "Left/right browse | B category"
-                  : openedItem.id === "gift" && giftGameMode === "playing"
-                    ? "Left/right move | A hint | B menu"
-                    : openedItem.id === "gift"
-                      ? "A start/retry | B menu"
-                  : "B menu | Left/Right next card"}
-            </p>
           </div>
         ) : null}
       </div>
