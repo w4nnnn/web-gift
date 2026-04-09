@@ -47,9 +47,6 @@ type GameboyScreenProps = {
   giftMisses: number
   giftTimeLeft: number
   giftItems: GiftFallingItem[]
-  status: string
-  isBgmEnabled: boolean
-  currentTrack: string | null
 }
 
 export function GameboyScreen({
@@ -74,9 +71,6 @@ export function GameboyScreen({
   giftMisses,
   giftTimeLeft,
   giftItems,
-  status,
-  isBgmEnabled,
-  currentTrack,
 }: GameboyScreenProps) {
   const DetailIcon = openedItem?.icon
   const activePhoto = photoAlbum[activePhotoIndex] ?? null
@@ -94,10 +88,10 @@ export function GameboyScreen({
   }, [giftItems])
 
   return (
-    <section className="rounded-[1.6rem] border-4 border-gb-bezel bg-gb-bezel-inner p-3 shadow-[inset_0_2px_14px_color-mix(in_oklab,var(--color-gb-shell-edge)_35%,black)] md:p-4">
+    <section className="rounded-[1.7rem] border-4 border-gb-bezel bg-gb-bezel-inner px-4 py-5 shadow-[inset_0_2px_14px_color-mix(in_oklab,var(--color-gb-shell-edge)_35%,black)] md:px-5 md:py-6">
       <div
         className={cn(
-          "relative aspect-[10/7] overflow-hidden rounded-md border-2 border-gb-screen-frame p-2 shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--color-gb-screen)_80%,black)]",
+          "relative aspect-square overflow-hidden rounded-md border border-gb-screen-frame p-1 shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--color-gb-screen)_80%,black)]",
           showOffScreen ? "bg-gb-screen-dim" : "bg-gb-screen"
         )}
         aria-label="gameboy-screen"
@@ -324,11 +318,6 @@ export function GameboyScreen({
                       )}
                     </div>
 
-                    <p className="truncate rounded-sm border border-gb-grid/35 bg-gb-pixel-off/70 px-2 py-1 text-[0.45rem] uppercase tracking-[0.11em] text-gb-screen-frame/85">
-                      {activeMomentsTab === "photo"
-                        ? activePhoto?.alt ?? "no photo"
-                        : activeVideo?.title ?? "no video"}
-                    </p>
                   </div>
                 )}
               </div>
@@ -421,11 +410,6 @@ export function GameboyScreen({
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md bg-gb-shell-inner px-3 py-2 text-[0.62rem] uppercase tracking-[0.18em] text-gb-label/90 md:text-[0.7rem]">
-        <span>Mode {screenState}</span>
-        <span>{status}</span>
-        <span>{currentTrack ? (isBgmEnabled ? "BGM ON" : "BGM OFF") : "BGM NONE"}</span>
-      </div>
     </section>
   )
 }

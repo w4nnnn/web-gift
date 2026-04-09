@@ -32,7 +32,6 @@ export function GameboyConsole() {
     giftMisses,
     giftTimeLeft,
     giftItems,
-    status,
     isBgmEnabled,
     isPressed,
     handleControlDown,
@@ -80,7 +79,7 @@ export function GameboyConsole() {
           </div>
         </CardHeader>
 
-        <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden pb-3 md:gap-6 md:pb-5">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden px-2 pb-2 md:gap-3 md:px-3 md:pb-3">
           <GameboyScreen
             showOffScreen={showOffScreen}
             isBooting={isBooting}
@@ -103,9 +102,6 @@ export function GameboyConsole() {
             giftMisses={giftMisses}
             giftTimeLeft={giftTimeLeft}
             giftItems={giftItems}
-            status={status}
-            isBgmEnabled={isBgmEnabled}
-            currentTrack={currentTrack}
           />
 
           <GameboyPadControls

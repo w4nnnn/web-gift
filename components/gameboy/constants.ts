@@ -88,6 +88,17 @@ export const BACKSOUND_FALLBACKS = [
   "/music/lofium-lofi-song-kertajina-by-lofium-236750.mp3"
 ]
 
+export const PHOTO_BGM_BY_PHOTO: Record<string, string> = {
+  "1.JPG": "/music/Forever Young - Alphaville.mp3",
+  "2.JPG": "/music/Thru These Tears - LANY.mp3",
+}
+
+// Dipakai saat foto tidak punya mapping khusus.
+export const PHOTO_BGM_DEFAULT_TRACK: string | null =
+  BACKSOUND_FALLBACKS[0] ?? null
+
+export const PHOTO_BGM_ENABLE_AUTO_MATCH = false
+
 export const GIFT_GAME_LANES = 5
 export const GIFT_GAME_ROWS = 6
 export const GIFT_GAME_TARGET_SCORE = 14

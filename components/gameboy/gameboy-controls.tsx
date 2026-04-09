@@ -43,15 +43,15 @@ export function GameboyPadControls({
   handleControlUp,
 }: GameboyPadControlsProps) {
   return (
-    <section className="grid grid-cols-2 items-end gap-4 md:gap-6">
+    <section className="mx-auto grid w-full max-w-[18rem] grid-cols-2 items-end gap-2 md:max-w-[20rem] md:gap-3">
       <div className="flex flex-col gap-2">
-        <p className="font-heading text-xs uppercase tracking-[0.24em] text-gb-label/85">
+        <p className="font-heading text-[0.68rem] uppercase tracking-[0.2em] text-gb-label/85">
           D-Pad
         </p>
-        <div className="grid w-fit grid-cols-3 grid-rows-3 gap-2">
+        <div className="grid w-fit grid-cols-3 grid-rows-3 gap-1.5">
           <Button
             variant="secondary"
-            size="icon-lg"
+            size="icon-sm"
             aria-label="Move Up"
             disabled={showOffScreen || isBooting}
             onPointerDown={handleControlDown("up")}
@@ -67,7 +67,7 @@ export function GameboyPadControls({
           </Button>
           <Button
             variant="secondary"
-            size="icon-lg"
+            size="icon-sm"
             aria-label="Move Left"
             disabled={showOffScreen || isBooting}
             onPointerDown={handleControlDown("left")}
@@ -83,7 +83,7 @@ export function GameboyPadControls({
           </Button>
           <Button
             variant="secondary"
-            size="icon-lg"
+            size="icon-sm"
             aria-label="Move Right"
             disabled={showOffScreen || isBooting}
             onPointerDown={handleControlDown("right")}
@@ -99,7 +99,7 @@ export function GameboyPadControls({
           </Button>
           <Button
             variant="secondary"
-            size="icon-lg"
+            size="icon-sm"
             aria-label="Move Down"
             disabled={showOffScreen || isBooting}
             onPointerDown={handleControlDown("down")}
@@ -117,13 +117,13 @@ export function GameboyPadControls({
       </div>
 
       <div className="flex flex-col gap-2 justify-self-end">
-        <p className="text-right font-heading text-xs uppercase tracking-[0.24em] text-gb-label/85">
+        <p className="text-right font-heading text-[0.68rem] uppercase tracking-[0.2em] text-gb-label/85">
           Actions
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <Button
             variant="secondary"
-            size="icon-lg"
+            size="icon-sm"
             aria-label="Button A"
             disabled={showOffScreen || isBooting}
             onPointerDown={handleControlDown("a")}
@@ -131,7 +131,7 @@ export function GameboyPadControls({
             onPointerLeave={handleControlUp("a")}
             onPointerCancel={handleControlUp("a")}
             className={cn(
-              "size-14 rounded-full border-2 border-gb-shell-edge bg-gb-action text-gb-action-foreground shadow-[0_4px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_72%,black)]",
+              "size-11 rounded-full border-2 border-gb-shell-edge bg-gb-action text-gb-action-foreground shadow-[0_4px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_72%,black)] md:size-12",
               isPressed("a") && "translate-y-px bg-gb-action-active"
             )}
           >
@@ -139,7 +139,7 @@ export function GameboyPadControls({
           </Button>
           <Button
             variant="secondary"
-            size="icon-lg"
+            size="icon-sm"
             aria-label="Button B"
             disabled={showOffScreen || isBooting}
             onPointerDown={handleControlDown("b")}
@@ -147,7 +147,7 @@ export function GameboyPadControls({
             onPointerLeave={handleControlUp("b")}
             onPointerCancel={handleControlUp("b")}
             className={cn(
-              "size-14 rounded-full border-2 border-gb-shell-edge bg-gb-action text-gb-action-foreground shadow-[0_4px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_72%,black)]",
+              "size-11 rounded-full border-2 border-gb-shell-edge bg-gb-action text-gb-action-foreground shadow-[0_4px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_72%,black)] md:size-12",
               isPressed("b") && "translate-y-px bg-gb-action-active"
             )}
           >
@@ -169,15 +169,15 @@ export function GameboySystemFooter({
   className,
 }: GameboySystemFooterProps) {
   return (
-    <CardFooter className={cn("justify-between gap-2 border-t border-gb-shell-edge/70 bg-transparent px-4 pt-4 pb-0", className)}>
+    <CardFooter className={cn("justify-center gap-2 border-t border-gb-shell-edge/70 bg-transparent px-5 pt-5 pb-2 md:justify-between md:px-4 md:pt-4 md:pb-0", className)}>
       <p className="hidden font-heading text-[0.62rem] uppercase tracking-[0.2em] text-gb-label/80 md:block md:text-[0.7rem]">
         Arrow / Z / X / Enter / Shift
       </p>
 
-      <ButtonGroup>
+      <ButtonGroup className="mx-auto md:mx-0">
         <Button
           variant="outline"
-          size="sm"
+          size="xs"
           aria-label="Toggle Music"
           disabled={showOffScreen || !currentTrack}
           onPointerDown={handleControlDown("select")}
@@ -185,7 +185,7 @@ export function GameboySystemFooter({
           onPointerLeave={handleControlUp("select")}
           onPointerCancel={handleControlUp("select")}
           className={cn(
-            "rounded-full border-2 border-gb-shell-edge bg-gb-shell-inner px-4 font-heading text-[0.62rem] uppercase tracking-[0.16em] text-gb-label shadow-[0_3px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_70%,black)]",
+            "rounded-full border-2 border-gb-shell-edge bg-gb-shell-inner px-3 font-heading text-[0.58rem] uppercase tracking-[0.14em] text-gb-label shadow-[0_3px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_70%,black)]",
             isPressed("select") && "translate-y-px bg-gb-key-active"
           )}
         >
@@ -198,14 +198,14 @@ export function GameboySystemFooter({
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="xs"
           aria-label="Power Toggle"
           onPointerDown={handleControlDown("start")}
           onPointerUp={handleControlUp("start")}
           onPointerLeave={handleControlUp("start")}
           onPointerCancel={handleControlUp("start")}
           className={cn(
-            "rounded-full border-2 border-gb-shell-edge bg-gb-shell-inner px-4 font-heading text-[0.62rem] uppercase tracking-[0.16em] text-gb-label shadow-[0_3px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_70%,black)]",
+            "rounded-full border-2 border-gb-shell-edge bg-gb-shell-inner px-3 font-heading text-[0.58rem] uppercase tracking-[0.14em] text-gb-label shadow-[0_3px_0_color-mix(in_oklab,var(--color-gb-shell-edge)_70%,black)]",
             isPressed("start") && "translate-y-px bg-gb-key-active"
           )}
         >

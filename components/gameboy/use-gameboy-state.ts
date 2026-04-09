@@ -16,6 +16,9 @@ import {
   KEY_TO_CONTROL,
   MENU_ITEMS,
   MOMENTS_SECTIONS,
+  PHOTO_BGM_BY_PHOTO,
+  PHOTO_BGM_DEFAULT_TRACK,
+  PHOTO_BGM_ENABLE_AUTO_MATCH,
 } from "@/components/gameboy/constants"
 import type {
   Control,
@@ -143,26 +146,67 @@ export function useGameboyState(): GameboyState {
 
     return map
   }, [bgmTracks])
+  const configuredPhotoTrackByKey = React.useMemo(() => {
+    const map = new Map<string, number>()
+
+    Object.entries(PHOTO_BGM_BY_PHOTO).forEach(([photoKey, musicSrc]) => {
+      const trackIndex = musicTrackByKey.get(toMediaKey(musicSrc))
+      if (trackIndex !== undefined) {
+        map.set(toMediaKey(photoKey), trackIndex)
+      }
+    })
+
+    return map
+  }, [musicTrackByKey])
+  const defaultBgmTrackIndex = React.useMemo(() => {
+    if (bgmTracks.length <= 0) {
+      return null
+    }
+
+    if (PHOTO_BGM_DEFAULT_TRACK) {
+      const configuredIndex = musicTrackByKey.get(toMediaKey(PHOTO_BGM_DEFAULT_TRACK))
+      if (configuredIndex !== undefined) {
+        return configuredIndex
+      }
+    }
+
+    for (const fallbackTrack of BACKSOUND_FALLBACKS) {
+      const fallbackIndex = musicTrackByKey.get(toMediaKey(fallbackTrack))
+      if (fallbackIndex !== undefined) {
+        return fallbackIndex
+      }
+    }
+
+    return 0
+  }, [bgmTracks.length, musicTrackByKey])
 
   const resolvePhotoTrackIndex = React.useCallback(
     (photoIndex: number) => {
-      if (bgmTracks.length <= 0) {
+      if (defaultBgmTrackIndex === null) {
         return null
       }
 
       const photo = photoAlbum[photoIndex]
       if (!photo) {
-        return 0
+        return defaultBgmTrackIndex
       }
 
-      const matchedIndex = musicTrackByKey.get(toMediaKey(photo.src))
-      if (matchedIndex !== undefined) {
-        return matchedIndex
+      const photoKey = toMediaKey(photo.src)
+      const configuredTrackIndex = configuredPhotoTrackByKey.get(photoKey)
+      if (configuredTrackIndex !== undefined) {
+        return configuredTrackIndex
       }
 
-      return photoIndex % bgmTracks.length
+      if (PHOTO_BGM_ENABLE_AUTO_MATCH) {
+        const matchedIndex = musicTrackByKey.get(photoKey)
+        if (matchedIndex !== undefined) {
+          return matchedIndex
+        }
+      }
+
+      return defaultBgmTrackIndex
     },
-    [bgmTracks.length, musicTrackByKey, photoAlbum]
+    [configuredPhotoTrackByKey, defaultBgmTrackIndex, musicTrackByKey, photoAlbum]
   )
 
   React.useEffect(() => {
@@ -589,7 +633,6 @@ export function useGameboyState(): GameboyState {
 
         if (music.length > 0) {
           setBgmTracks(music)
-          setTrackIndex(0)
         }
       } catch {
         // Ignore media loading errors and keep local fallbacks.
@@ -661,17 +704,20 @@ export function useGameboyState(): GameboyState {
   }, [currentTrack, isBgmEnabled, isPoweredOn, playBgm, stopBgm])
 
   React.useEffect(() => {
-    if (
-      !isPoweredOn ||
-      screenState !== "detail" ||
-      openedItem?.id !== "moments" ||
-      momentsViewMode !== "viewer" ||
-      activeMomentsTab !== "photo"
-    ) {
+    if (!isPoweredOn || defaultBgmTrackIndex === null) {
       return
     }
 
-    const targetTrackIndex = resolvePhotoTrackIndex(activePhotoIndex)
+    const isPhotoViewerMode =
+      screenState === "detail" &&
+      openedItem?.id === "moments" &&
+      momentsViewMode === "viewer" &&
+      activeMomentsTab === "photo"
+
+    const targetTrackIndex = isPhotoViewerMode
+      ? resolvePhotoTrackIndex(activePhotoIndex)
+      : defaultBgmTrackIndex
+
     if (targetTrackIndex === null) {
       return
     }
@@ -682,6 +728,7 @@ export function useGameboyState(): GameboyState {
   }, [
     activeMomentsTab,
     activePhotoIndex,
+    defaultBgmTrackIndex,
     isPoweredOn,
     momentsViewMode,
     openedItem?.id,
