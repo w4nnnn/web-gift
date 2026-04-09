@@ -297,7 +297,7 @@ export function GameboyScreen({
                         ) : (
                           <div className="flex h-full items-center justify-center">
                             <p className="text-[0.5rem] uppercase tracking-[0.12em] text-gb-screen-frame/80">
-                              tambahkan foto ke folder public/photo
+                              add photos to public/photo folder
                             </p>
                           </div>
                         )
@@ -312,7 +312,7 @@ export function GameboyScreen({
                       ) : (
                         <div className="flex h-full items-center justify-center">
                           <p className="text-[0.5rem] uppercase tracking-[0.12em] text-gb-screen-frame/80">
-                            tambahkan video ke folder public/video
+                            add videos to public/video folder
                           </p>
                         </div>
                       )}

@@ -24,33 +24,33 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     id: "wish",
     title: "Birthday Wish",
-    subtitle: "surat kecil untukmu",
+    subtitle: "a little letter for you",
     icon: ScrollText,
     notes: [
-      "selamat ulang tahun, semoga harimu hangat dan tenang.",
-      "terima kasih sudah jadi orang yang berarti di hidupku.",
-      "semoga tahun ini lebih ringan, lebih berani, dan lebih bahagia.",
+      "happy birthday, may your day feel warm and peaceful.",
+      "thank you for being someone meaningful in my life.",
+      "may this year feel lighter, braver, and happier for you.",
     ],
   },
   {
     id: "moments",
     title: "Best Moments",
-    subtitle: "album foto dan video",
+    subtitle: "photo and video album",
     icon: ImageIcon,
     notes: [
-      "kumpulan momen terbaik kita ada di sini.",
-      "geser menu lain kalau mau lihat bagian hadiah berikutnya.",
+      "our best moments are all collected here.",
+      "move to other menus if you want to explore the next gift section.",
     ],
   },
   {
     id: "gift",
     title: "Final Gift",
-    subtitle: "mini game heart collector",
+    subtitle: "heart collector mini game",
     icon: Gift,
     notes: [
-      "kumpulkan hati untuk membuka hadiah utama.",
-      "gerak dengan kiri kanan, hindari tanda silang.",
-      "press A untuk mulai atau ulangi permainan.",
+      "collect hearts to unlock the final gift.",
+      "move left and right, avoid the X marks.",
+      "press A to start or restart the game.",
     ],
   },
 ]
@@ -64,13 +64,13 @@ export const MOMENTS_SECTIONS: {
   {
     id: "photo",
     title: "Photo Album",
-    subtitle: "lihat foto penuh",
+    subtitle: "view full photos",
     icon: ImageIcon,
   },
   {
     id: "video",
     title: "Video Album",
-    subtitle: "lihat video penuh",
+    subtitle: "view full videos",
     icon: Film,
   },
 ]
@@ -93,7 +93,7 @@ export const PHOTO_BGM_BY_PHOTO: Record<string, string> = {
   "2.JPG": "/music/Thru These Tears - LANY.mp3",
 }
 
-// Dipakai saat foto tidak punya mapping khusus.
+// Used when a photo does not have a specific mapping.
 export const PHOTO_BGM_DEFAULT_TRACK: string | null =
   BACKSOUND_FALLBACKS[0] ?? null
 
@@ -107,16 +107,16 @@ export const GIFT_GAME_TIME_LIMIT = 38
 export const GIFT_GAME_TICK_MS = 360
 
 export const FINAL_GIFT_REWARD_LINES = [
-  "hadiah terbaikku: doa baik, waktu, dan perhatian yang terus ada.",
-  "semoga kamu merasa dicintai, bukan cuma hari ini tapi selalu.",
-  "terima kasih sudah jadi orang yang berarti buatku.",
+  "my best gift: kind prayers, time, and lasting care.",
+  "may you always feel loved, not only today.",
+  "thank you for being someone truly meaningful to me.",
 ]
 
 export const BIRTHDAY_WISH_TEXT = [
   "happy birthday.",
-  "terima kasih karena selalu hadir dengan cara yang sederhana tapi berarti.",
-  "semoga langkahmu tahun ini lebih ringan, lebih berani, dan lebih bahagia.",
-  "semoga semua doa baik menemukan jalannya ke kamu, satu per satu.",
+  "thank you for always being present in simple but meaningful ways.",
+  "may your steps this year feel lighter, braver, and happier.",
+  "may every good prayer find its way to you, one by one.",
 ].join("\n\n")
 
 export const formatMediaLabel = (src: string) =>

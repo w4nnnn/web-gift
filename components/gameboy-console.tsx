@@ -1,12 +1,25 @@
 "use client"
 
+import * as React from "react"
+import { Gamepad2, Keyboard, Power, Volume2 } from "lucide-react"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GameboyPadControls, GameboySystemFooter } from "@/components/gameboy/gameboy-controls"
 import { GameboyScreen } from "@/components/gameboy/gameboy-screen"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useGameboyState } from "@/components/gameboy/use-gameboy-state"
 import { cn } from "@/lib/utils"
 
 export function GameboyConsole() {
+  const [isGuideOpen, setIsGuideOpen] = React.useState(true)
+
   const {
     audioRef,
     currentTrack,
@@ -40,6 +53,77 @@ export function GameboyConsole() {
 
   return (
     <main className="relative h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_16%_10%,color-mix(in_oklab,var(--color-gb-aura)_68%,transparent),transparent_38%),radial-gradient(circle_at_90%_0%,color-mix(in_oklab,var(--color-gb-screen)_42%,white),transparent_32%),linear-gradient(180deg,var(--color-gb-bg-top),var(--color-gb-bg-bottom))] px-3 py-3 md:px-5 md:py-4">
+      <Dialog open={isGuideOpen} onOpenChange={setIsGuideOpen}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-[min(92vw,34rem)] overflow-hidden border-2 border-gb-shell-edge bg-[linear-gradient(160deg,color-mix(in_oklab,var(--color-gb-shell)_92%,white),color-mix(in_oklab,var(--color-gb-shell-inner)_90%,black))] p-0 text-gb-label"
+        >
+          <DialogHeader className="gap-1 border-b border-gb-shell-edge/70 bg-gb-shell-inner/70 px-4 pt-4 pb-3">
+            <DialogTitle className="font-heading text-sm uppercase tracking-[0.2em] text-gb-label">
+              How To Use Web Boy
+            </DialogTitle>
+            <DialogDescription className="text-[0.68rem] uppercase tracking-[0.13em] text-gb-label/85">
+              The console starts in OFF state. Press Start to power on.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-2 px-4 py-3 text-[0.66rem] uppercase tracking-[0.12em]">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div className="rounded-lg border border-gb-shell-edge/70 bg-gb-shell-inner/75 px-3 py-2">
+                <p className="mb-1 flex items-center gap-1.5 font-heading text-[0.62rem] tracking-[0.14em] text-gb-label/95">
+                  <Power className="size-3" />
+                  Power
+                </p>
+                <p className="text-gb-label/80">Start: turn console ON/OFF</p>
+              </div>
+
+              <div className="rounded-lg border border-gb-shell-edge/70 bg-gb-shell-inner/75 px-3 py-2">
+                <p className="mb-1 flex items-center gap-1.5 font-heading text-[0.62rem] tracking-[0.14em] text-gb-label/95">
+                  <Gamepad2 className="size-3" />
+                  Navigation
+                </p>
+                <p className="text-gb-label/80">D-pad: select menu or browse photos/videos</p>
+              </div>
+
+              <div className="rounded-lg border border-gb-shell-edge/70 bg-gb-shell-inner/75 px-3 py-2">
+                <p className="mb-1 flex items-center gap-1.5 font-heading text-[0.62rem] tracking-[0.14em] text-gb-label/95">
+                  <Keyboard className="size-3" />
+                  A/B Buttons
+                </p>
+                <p className="text-gb-label/80">A: confirm/action, B: go back</p>
+              </div>
+
+              <div className="rounded-lg border border-gb-shell-edge/70 bg-gb-shell-inner/75 px-3 py-2">
+                <p className="mb-1 flex items-center gap-1.5 font-heading text-[0.62rem] tracking-[0.14em] text-gb-label/95">
+                  <Volume2 className="size-3" />
+                  Audio
+                </p>
+                <p className="text-gb-label/80">Select: toggle BGM on/off</p>
+              </div>
+            </div>
+
+            <p className="rounded-md border border-gb-shell-edge/65 bg-gb-shell-inner/60 px-3 py-2 text-[0.58rem] tracking-[0.12em] text-gb-label/78">
+              Keyboard: Arrow, Z, X, Enter, Shift
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 border-t border-gb-shell-edge/70 bg-gb-shell-inner/65 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[0.58rem] uppercase tracking-[0.13em] text-gb-label/75">
+              This guide appears automatically on every refresh.
+            </p>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="rounded-full border border-gb-shell-edge bg-gb-action px-4 font-heading text-[0.62rem] uppercase tracking-[0.15em] text-gb-action-foreground"
+              onClick={() => setIsGuideOpen(false)}
+            >
+              Start Playing
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <audio
         ref={audioRef}
         src={currentTrack ?? undefined}

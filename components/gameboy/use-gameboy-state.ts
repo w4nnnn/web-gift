@@ -89,15 +89,15 @@ const createGiftGameState = (mode: GiftGameMode = "idle"): GiftGameState => ({
 })
 
 export function useGameboyState(): GameboyState {
-  const [isPoweredOn, setIsPoweredOn] = React.useState(true)
-  const [screenState, setScreenState] = React.useState<ScreenState>("booting")
+  const [isPoweredOn, setIsPoweredOn] = React.useState(false)
+  const [screenState, setScreenState] = React.useState<ScreenState>("off")
   const [bootProgress, setBootProgress] = React.useState(0)
   const [selectedIndex, setSelectedIndex] = React.useState(0)
   const [openedIndex, setOpenedIndex] = React.useState<number | null>(null)
   const [pressedControls, setPressedControls] = React.useState<Set<Control>>(
     () => new Set()
   )
-  const [status, setStatus] = React.useState("INITIALIZING SYSTEM")
+  const [status, setStatus] = React.useState("POWER OFF")
   const [isBgmEnabled, setIsBgmEnabled] = React.useState(true)
   const [trackIndex, setTrackIndex] = React.useState(0)
   const [typedWish, setTypedWish] = React.useState("")
@@ -540,6 +540,11 @@ export function useGameboyState(): GameboyState {
           setStatus(giftGame.mode === "playing" ? "LEFT RIGHT TO MOVE" : "PRESS A TO START")
         }
 
+        return
+      }
+
+      if (openedItem?.id === "wish" && (control === "up" || control === "down")) {
+        setStatus("USE B TO GO BACK")
         return
       }
 
