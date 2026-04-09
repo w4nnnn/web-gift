@@ -229,6 +229,11 @@
   animation: gb-boot-line 280ms ease-out forwards;
 }
 
+.gb-type-caret {
+  margin-left: 2px;
+  animation: gb-caret 700ms steps(1, end) infinite;
+}
+
 @keyframes gb-boot {
   from {
     opacity: 0;
@@ -260,10 +265,22 @@
   }
 }
 
+@keyframes gb-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gb-console-boot,
   .gb-scanline,
-  .gb-boot-line {
+  .gb-boot-line,
+  .gb-type-caret {
     animation: none;
   }
 }
