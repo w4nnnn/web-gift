@@ -107,17 +107,25 @@ export const GIFT_GAME_TIME_LIMIT = 38
 export const GIFT_GAME_TICK_MS = 360
 
 export const FINAL_GIFT_REWARD_LINES = [
-  "my best gift: kind prayers, time, and lasting care.",
-  "may you always feel loved, not only today.",
-  "thank you for being someone truly meaningful to me.",
+  "my gift for you is this: our memories, our jokes, and our endless chats.",
+  "thank you for being a friend who makes ordinary days feel special.",
+  "here is to more trips, more stories, and more wins together.",
 ]
 
-export const BIRTHDAY_WISH_TEXT = [
-  "happy birthday.",
-  "thank you for always being present in simple but meaningful ways.",
-  "may your steps this year feel lighter, braver, and happier.",
-  "may every good prayer find its way to you, one by one.",
-].join("\n\n")
+export const BIRTHDAY_WISH_TEXT = `Friday, 10th April 2026
+
+Happy 23rd birthday, Anggi!
+Whose birthday is ittt? 😋
+Who would have thought, right? Our first meeting at Mount Sindoro was so unexpected. I never imagined we would get this close and stay in touch this well.
+
+Try to reduce those bad habits, you already know what I always tell you 🤫
+Keep your spirit up and stay strong!
+I hope we can always support each other.
+
+Wish you all the best!
+
+With all my support,
+Zea🐥`
 
 export const formatMediaLabel = (src: string) =>
   decodeURIComponent(src.split("/").pop() ?? src)

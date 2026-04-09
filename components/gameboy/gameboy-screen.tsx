@@ -210,7 +210,7 @@ export function GameboyScreen({
 
             {openedItem.id === "wish" ? (
               <div className="flex flex-1 overflow-hidden rounded-sm border border-gb-grid/35 bg-gb-pixel-off/70 px-2 py-2">
-                <p className="w-full overflow-y-auto whitespace-pre-wrap text-[0.54rem] uppercase tracking-[0.12em] text-gb-screen-frame/90">
+                <p className="w-full overflow-y-auto whitespace-pre-wrap text-[0.54rem] tracking-[0.12em] text-gb-screen-frame/90">
                   {typedWish}
                   {typedWish.length < BIRTHDAY_WISH_TEXT.length ? (
                     <span className="gb-type-caret">|</span>
